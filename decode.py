@@ -1,3 +1,5 @@
+# https://docs.python.org/2/library/struct.html
+
 import struct
 from struct import *
 import pandas as pd
@@ -6,6 +8,39 @@ import sys,os
 import numpy as np
 
 plt.ion()
+
+def GetWaveformsNoiseRemoval(fin):
+
+    ev_wfs = GetWaveforms(fin)
+
+    out_wfs = []
+
+    for n in xrange(1,len(ev_wfs)):
+        anode_wf   = ev_wfs[n][0]
+        cathode_wf = ev_wfs[n][1]
+        # find start of this waveform
+        anodestart = 0
+        for i,V in enumerate(anode_wf):
+            if (V > 0.02):
+                anodestart = i
+                break
+        wf_a = np.array(anode_wf[anodestart:anodestart+3000])
+        wf_c = np.array(cathode_wf[anodestart:anodestart+3000])
+
+        freq_v = np.fft.fftfreq(3000,d=0.0005)
+
+        wf_a_freq_signl = np.fft.rfft(wf_a)
+        wf_c_freq_signl = np.fft.rfft(wf_c)
+        # cut freq. above 20 kHz
+        wf_a_freq_signl[(freq_v > 30)] = 0
+        wf_c_freq_signl[(freq_v > 30)] = 0
+
+        wf_a_filtered = np.fft.irfft(wf_a_freq_signl)
+        wf_c_filtered = np.fft.irfft(wf_c_freq_signl)
+
+        out_wfs.append( [wf_a_filtered[100:-100], wf_c_filtered[100:-100]] )
+
+    return out_wfs
 
 def GetWaveforms(fin):
 
