@@ -9,7 +9,7 @@ import numpy as np
 
 plt.ion()
 
-def GetWaveformsNoiseRemoval(fin):
+def GetWaveformsNoiseRemoval(fin,nsample,freqCut,dt=0.0005):
 
     ev_wfs = GetWaveforms(fin)
 
@@ -24,16 +24,16 @@ def GetWaveformsNoiseRemoval(fin):
             if (V > 0.02):
                 anodestart = i
                 break
-        wf_a = np.array(anode_wf[anodestart:anodestart+3000])
-        wf_c = np.array(cathode_wf[anodestart:anodestart+3000])
+        wf_a = np.array(anode_wf[anodestart:anodestart+nsample])
+        wf_c = np.array(cathode_wf[anodestart:anodestart+nsample])
 
-        freq_v = np.fft.fftfreq(3000,d=0.0005)
+        freq_v = np.fft.fftfreq(nsample,dt)
 
         wf_a_freq_signl = np.fft.rfft(wf_a)
         wf_c_freq_signl = np.fft.rfft(wf_c)
         # cut freq. above 20 kHz
-        wf_a_freq_signl[(freq_v > 30)] = 0
-        wf_c_freq_signl[(freq_v > 30)] = 0
+        wf_a_freq_signl[(freq_v > freqCut)] = 0
+        wf_c_freq_signl[(freq_v > freqCut)] = 0
 
         wf_a_filtered = np.fft.irfft(wf_a_freq_signl)
         wf_c_filtered = np.fft.irfft(wf_c_freq_signl)

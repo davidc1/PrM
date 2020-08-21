@@ -12,6 +12,8 @@ def GetWaveformsNoiseRemoval(fin):
 
     ev_wfs = GetWaveforms(fin)
 
+    #print "There are %i waveforms "%(len(ev_wfs))
+    
     out_wfs = []
 
     for n in xrange(1,len(ev_wfs)):
@@ -25,9 +27,25 @@ def GetWaveformsNoiseRemoval(fin):
                 break
         wf_a = np.array(anode_wf[anodestart:anodestart+3000])
         wf_c = np.array(cathode_wf[anodestart:anodestart+3000])
+
+        std = np.std(np.array(wf_c))
+        #print 'std of wf : %.04f'%std
+
+        if (std == 0):
+            continue
+        
+        out_wfs.append( [wf_a[100:1400], wf_c[100:1400]] )
+        continue
+        
         #print(len(wf_a))
-        freq_v = np.fft.fftfreq(1501,d=0.005)
-        aaa=freq_v>20
+        if (len(wf_a) != 3000):
+            break
+        if (len(wf_a)%2==1):
+            wf_a = wf_a[:-2]
+            wf_c = wf_c[:-2]
+        #freq_v = np.fft.fftfreq(1501,d=0.005)
+        freq_v = np.fft.fftfreq(len(wf_a)/2+1,d=0.005)
+        aaa=freq_v>2000
         #print(len(aaa))
         wf_a_freq_signl = np.fft.rfft(wf_a)
         wf_c_freq_signl = np.fft.rfft(wf_c)
@@ -39,8 +57,9 @@ def GetWaveformsNoiseRemoval(fin):
         wf_a_filtered = np.fft.irfft(wf_a_freq_signl)
         wf_c_filtered = np.fft.irfft(wf_c_freq_signl)
 
-        out_wfs.append( [wf_a_filtered[100:-100], wf_c_filtered[100:-100]] )
+        out_wfs.append( [wf_a_filtered[100:1400], wf_c_filtered[100:1400]] )
 
+    #print 'returning %i waveforms'%(len(out_wfs))
     return out_wfs
 
 def GetWaveforms(fin):
@@ -55,15 +74,24 @@ def GetWaveforms(fin):
     currbyte = 0
     ctr = 0
     fmt = ''
+
+    headers_v = []
+    
     for byte in byte_v:
         if byte == 4:
             fmt = 'I'
         if byte == 2:
             fmt = 'H'
         cS = struct.unpack(fmt,bd[currbyte:currbyte+byte])[0]
+        headers_v.append(cS)
+        #print 'header word %02i : '%ctr,cS
         currbyte += byte
         
         ctr += 1
+
+    # number of recorded waveforms
+    NWF = int(headers_v[-1])
+    
 
     byte_v = [8,8]
     words_v = []
@@ -77,6 +105,7 @@ def GetWaveforms(fin):
         ctr += 1
 
     dt = words_v[-1]*1e3
+    #print 'dt is ',dt
 
     byte_v = [4,4]
     out_v = []
@@ -102,18 +131,23 @@ def GetWaveforms(fin):
     
     byte = 4
     wf_v = []
-    for i in xrange(50):
+    for i in xrange(NWF):
         wf_v = []
         for ch in xrange(nchan):
             #print 'WAVEFORM %i'%ch
             wf_v.append([])
             for n in xrange(nword):
-                #print bd[currbyte:currbyte+byte]
                 cS = struct.unpack('f',bd[currbyte:currbyte+byte])[0]
+                #print "ADC ",cS
                 wf_v[-1].append(cS)
                 currbyte += byte
 
         ev_wf_v.append(wf_v)
+
+        #print 'number of samples : ',len(wf_v[-1])
+        #print 'first ADC : ',wf_v[-1][0]
+
+        #break
 
         '''
         fig.gca().cla()
