@@ -49,6 +49,8 @@ AVG_C_MIN_V = []
 VOLTAGE_V = []
 ```
 
+[avg_6000v.pdf](https://github.com/davidc1/PrM/files/7218905/avg_6000v.pdf)
+
 # Timing analysis 
 
 This block of code identifies the crossings for the Cathode, CG, AG, and Anode.
@@ -68,6 +70,7 @@ Identify crossings by finding inflection points in waveform. Done for A and C wa
 if (ADC1 < -0.3 and ADC2 < -0.3):
     Ccrossing = tick
 ```
+![exampletiming](https://user-images.githubusercontent.com/5184059/134536971-4f67a45b-7adf-4de4-ab37-3df78e07c69e.png)
 
 # Timing results
 
