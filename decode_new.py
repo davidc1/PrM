@@ -105,7 +105,7 @@ def GetWaveforms(fin):
         ctr += 1
 
     dt = words_v[-1]*1e3
-    #print 'dt is ',dt
+    print 'dt is ',dt
 
     byte_v = [4,4]
     out_v = []
