@@ -48,8 +48,7 @@ AVG_C_MIN_V = []
 # voltage
 VOLTAGE_V = []
 ```
-
-[avg_6000v.pdf](https://github.com/davidc1/PrM/files/7218905/avg_6000v.pdf)
+![exampleavg](https://user-images.githubusercontent.com/5184059/134537055-d5abc2c4-93c4-46e8-8fb6-d15cfac40c7c.png)
 
 # Timing analysis 
 
