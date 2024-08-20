@@ -8,15 +8,15 @@ import numpy as np
 
 plt.ion()
 
-def GetWaveformsNoiseRemoval(fin):
+def GetWaveformsNoiseRemoval(fin,verbose=False):
 
     ev_wfs = GetWaveforms(fin)
 
-    #print "There are %i waveforms "%(len(ev_wfs))
+    if (verbose): print ("There are %i waveforms "%(len(ev_wfs)))
     
     out_wfs = []
 
-    for n in xrange(1,len(ev_wfs)):
+    for n in range(1,len(ev_wfs)):
         anode_wf   = ev_wfs[n][0]
         cathode_wf = ev_wfs[n][1]
         # find start of this waveform
@@ -29,7 +29,7 @@ def GetWaveformsNoiseRemoval(fin):
         wf_c = np.array(cathode_wf[anodestart:anodestart+3000])
 
         std = np.std(np.array(wf_c))
-        #print 'std of wf : %.04f'%std
+        if (verbose): print ('std of wf : %.04f'%std)
 
         if (std == 0):
             continue
@@ -37,7 +37,7 @@ def GetWaveformsNoiseRemoval(fin):
         out_wfs.append( [wf_a[100:1400], wf_c[100:1400]] )
         continue
         
-        #print(len(wf_a))
+        if (verbose): print(len(wf_a))
         if (len(wf_a) != 3000):
             break
         if (len(wf_a)%2==1):
@@ -105,7 +105,7 @@ def GetWaveforms(fin):
         ctr += 1
 
     dt = words_v[-1]*1e3
-    print 'dt is ',dt
+    print ('dt is ',dt)
 
     byte_v = [4,4]
     out_v = []
@@ -131,12 +131,12 @@ def GetWaveforms(fin):
     
     byte = 4
     wf_v = []
-    for i in xrange(NWF):
+    for i in range(NWF):
         wf_v = []
-        for ch in xrange(nchan):
+        for ch in range(nchan):
             #print 'WAVEFORM %i'%ch
             wf_v.append([])
-            for n in xrange(nword):
+            for n in range(nword):
                 cS = struct.unpack('f',bd[currbyte:currbyte+byte])[0]
                 #print "ADC ",cS
                 wf_v[-1].append(cS)
